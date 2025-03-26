@@ -1,5 +1,7 @@
 const express = require('express');
+const connectDB = require("./Config/database");
 const app = express();
+const User = require("./models/user")
 const {adminauth,userauth} = require("./Middleware/auth")
 // app.get("/user", (req,res)=>{
 //     console.log(req.query)
@@ -44,14 +46,39 @@ const {adminauth,userauth} = require("./Middleware/auth")
 // })
 
 //------------------------Handling Error------------------------
-app.use("/",(err,req,res)=>{
-    if(err){
-        res.status(500).send("Something went wrong!")
-    }
-})
+// app.use("/",(err,req,res)=>{
+//     if(err){
+//         res.status(500).send("Something went wrong!")
+//     }
+// })
+// --------------------------------------------------------------
+
+    app.post("/signup" , async (req,res)=>{
+        const user = new User({
+            firstName : "Himanshu",
+            lastName : "Jaglyan",
+            emailId : "himanshujaglyan29@gmail.com",
+            password : "12345",
+        });
+        try{
+            await user.save();
+            res.send("User successfully Added!");
+        }
+        catch(err){
+            res.status(400).send("Error saving the user" +err.message)
+        }
+    });
+
+connectDB()
+    .then(()=>{
+        console.log("Database connected");
+        app.listen(3000,()=>{
+            console.log("Server is successfuly listening on port 3000......")
+        });
+    })
+    .catch((err)=>{ 
+        console.log("Database connot connected");
+    });
 
 
-
-app.listen(3000,()=>{
-    console.log("Server is successfuly listening on port 3000......")
-});
+// mongodb+srv://HimanshuJaglyan:Himanshu123@namastenode.4ette.mongodb.net/
