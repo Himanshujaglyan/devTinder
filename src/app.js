@@ -52,14 +52,11 @@ const {adminauth,userauth} = require("./Middleware/auth")
 //     }
 // })
 // --------------------------------------------------------------
-
+    app.use(express.json());
     app.post("/signup" , async (req,res)=>{
-        const user = new User({
-            firstName : "Himanshu",
-            lastName : "Jaglyan",
-            emailId : "himanshujaglyan29@gmail.com",
-            password : "12345",
-        });
+        // console.log(req.body);
+        // This is basically the static request⬇️**************
+        const user = new User(req.body);
         try{
             await user.save();
             res.send("User successfully Added!");
