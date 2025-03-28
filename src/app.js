@@ -52,7 +52,7 @@ const {adminauth,userauth} = require("./Middleware/auth")
 //     }
 // })
 // --------------------------------------------------------------
-    app.use(express.json());
+    app.use(express.json());//this is middleware which helps to convert json into js object because server can't undertand json directly
     app.post("/signup" , async (req,res)=>{
         // console.log(req.body);
         // This is basically the static request⬇️**************
@@ -65,6 +65,34 @@ const {adminauth,userauth} = require("./Middleware/auth")
             res.status(400).send("Error saving the user" +err.message)
         }
     });
+    //Get Request
+    app.get("/signup", async(req,res)=>{
+        const userEmail = req.body.emailId;
+
+    try{
+        const users = await User.find({emailId : userEmail})
+        if(users.length === 0){
+            res.send("User Not found!!");
+        }else{
+            res.send(users);
+        }   
+    }
+    catch(err){
+        res.status(401).send("Something went wrong!!")
+    }
+    })
+    //Delete request
+    app.delete("/user",async(req,res)=>{
+        const userId = req.body.userId;
+        try{
+            await User.findByIdAndDelete({_id : userId});
+            res.send("User Deleted Successfully!")
+        }
+        catch(err){
+            res.status(401).send("Something went Wrong!!")
+        }
+    })
+
 
 connectDB()
     .then(()=>{
