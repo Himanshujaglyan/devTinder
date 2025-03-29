@@ -4,6 +4,7 @@ const app = express();
 const User = require("./models/user")
 const {adminauth,userauth} = require("./Middleware/auth")
 const {validatesignupdata} = require("./utils/validatesignupdata")
+const bcrypt = require("bcrypt")
 // app.get("/user", (req,res)=>{
 //     console.log(req.query)
 //     res.send({"Name":"Himanshu","age":"21"})
@@ -57,8 +58,15 @@ const {validatesignupdata} = require("./utils/validatesignupdata")
     app.post("/signup", async (req, res) => {
         try {
             validatesignupdata(req); //  Agar yahan error aayi toh catch block me chali jayegi
-    
-            const user = new User(req.body);
+            const {firstName,lastName,emailId,password} = req.body;
+            const passwordHash = await bcrypt.hash(password,10);
+            // console.log(passwordHash);
+            const user = new User({
+                firstName,
+                lastName, 
+                emailId, 
+                password : passwordHash
+            });
             await user.save();
             res.send("User successfully Added!");
         } catch (err) {
