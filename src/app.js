@@ -3,6 +3,7 @@ const connectDB = require("./Config/database");
 const app = express();
 const User = require("./models/user")
 const {adminauth,userauth} = require("./Middleware/auth")
+const {validatesignupdata} = require("./utils/validatesignupdata")
 // app.get("/user", (req,res)=>{
 //     console.log(req.query)
 //     res.send({"Name":"Himanshu","age":"21"})
@@ -53,16 +54,15 @@ const {adminauth,userauth} = require("./Middleware/auth")
 // })
 // --------------------------------------------------------------
     app.use(express.json());//this is middleware which helps to convert json into js object because server can't undertand json directly
-    app.post("/signup" , async (req,res)=>{
-        // console.log(req.body);
-        // This is basically the static request⬇️**************
-        const user = new User(req.body);
-        try{
+    app.post("/signup", async (req, res) => {
+        try {
+            validatesignupdata(req); //  Agar yahan error aayi toh catch block me chali jayegi
+    
+            const user = new User(req.body);
             await user.save();
             res.send("User successfully Added!");
-        }
-        catch(err){
-            res.status(400).send("Error saving the user" +err.message)
+        } catch (err) {
+            res.status(400).send("Validation Error: " + err.message); // 🛠️ Error ka proper response
         }
     });
     //Get Request
@@ -92,6 +92,36 @@ const {adminauth,userauth} = require("./Middleware/auth")
             res.status(401).send("Something went Wrong!!")
         }
     })
+    // Update the data by using perticular id
+    app.patch("/user/:userID", async (req, res) => {
+        const userId = req.params?.userID;
+        const data = req.body;
+    
+        try {
+
+            const Allowed_fields = ["firstName", "about", "age"];
+            const isupdateallowed = Object.keys(data).every((k) =>
+                Allowed_fields.includes(k)
+            );
+    
+            if (!isupdateallowed) {
+                return res.status(400).send("Update not allowed!");
+            }
+    
+            const user = await User.findById(userId);
+            if (!user) {
+                return res.status(404).send("User not found!");
+            }
+
+            const updatedUser = await User.findByIdAndUpdate(userId, data, { new: true });
+    
+            res.send("Update successfully!!");
+        } catch (err) {
+            console.error(err);
+            res.status(500).send("Something went wrong!!");
+        }
+    });
+    
 
 
 connectDB()
