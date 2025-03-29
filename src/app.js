@@ -5,6 +5,7 @@ const User = require("./models/user")
 const {adminauth,userauth} = require("./Middleware/auth")
 const {validatesignupdata} = require("./utils/validatesignupdata")
 const bcrypt = require("bcrypt")
+const validator = require("validator")
 // app.get("/user", (req,res)=>{
 //     console.log(req.query)
 //     res.send({"Name":"Himanshu","age":"21"})
@@ -55,6 +56,7 @@ const bcrypt = require("bcrypt")
 // })
 // --------------------------------------------------------------
     app.use(express.json());//this is middleware which helps to convert json into js object because server can't undertand json directly
+   //Sign UP
     app.post("/signup", async (req, res) => {
         try {
             validatesignupdata(req); //  Agar yahan error aayi toh catch block me chali jayegi
@@ -73,6 +75,33 @@ const bcrypt = require("bcrypt")
             res.status(400).send("Validation Error: " + err.message); // 🛠️ Error ka proper response
         }
     });
+
+    //Login
+    app.post("/login" ,async(req,res) => {
+        try{
+            const {emailId , password} = req.body;
+            if(!validator.isEmail(emailId)){
+                throw new Error("Email not valid!");
+            }else if(!validator.isStrongPassword(password)){
+                throw new Error("Not a strong password!");
+            }
+            
+             const user = await User.findOne({emailId:emailId})  
+            if(!user){
+                throw new Error("User not found in DB");
+            }
+            const isPasswordMatch = await bcrypt.compare(password , user.password);
+            if(isPasswordMatch){
+                res.send("Login Successfully!!");
+            }else{
+                throw new Error("Password not correct!!")
+            }
+        }
+        catch(err){
+            res.status(400).send("Error : " + err.message);
+        }
+    })
+
     //Get Request
     app.get("/signup", async(req,res)=>{
         const userEmail = req.body.emailId;
