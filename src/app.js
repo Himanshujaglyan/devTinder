@@ -2,10 +2,12 @@ const express = require('express');
 const connectDB = require("./Config/database");
 const app = express();
 const User = require("./models/user")
-const {adminauth,userauth} = require("./Middleware/auth")
+const {userauth} = require("./Middleware/auth")
 const {validatesignupdata} = require("./utils/validatesignupdata")
 const bcrypt = require("bcrypt")
 const validator = require("validator")
+const cookieParser = require("cookie-parser")
+const jwt = require("jsonwebtoken");
 // app.get("/user", (req,res)=>{
 //     console.log(req.query)
 //     res.send({"Name":"Himanshu","age":"21"})
@@ -56,7 +58,8 @@ const validator = require("validator")
 // })
 // --------------------------------------------------------------
     app.use(express.json());//this is middleware which helps to convert json into js object because server can't undertand json directly
-   //Sign UP
+    app.use(cookieParser());
+    //Sign UP
     app.post("/signup", async (req, res) => {
         try {
             validatesignupdata(req); //  Agar yahan error aayi toh catch block me chali jayegi
@@ -92,6 +95,8 @@ const validator = require("validator")
             }
             const isPasswordMatch = await bcrypt.compare(password , user.password);
             if(isPasswordMatch){
+                const token = await jwt.sign({_id:user._id} ,"Dev@Tinder#786");//,{expiresIn:"0d"}
+                res.cookie("token",token)
                 res.send("Login Successfully!!");
             }else{
                 throw new Error("Password not correct!!")
@@ -101,7 +106,22 @@ const validator = require("validator")
             res.status(400).send("Error : " + err.message);
         }
     })
-
+    //Profile
+    app.get("/profile",userauth,(req,res)=>{
+        try{
+            const user = req.user;
+            res.send(user)
+        }
+        catch(err){
+            res.status(400).send("ERROR : "+err.message);
+        }
+    }) 
+    //Connection Request
+    app.post("/sendConnectionRequest" ,userauth, (req,res)=>{
+        const userName = req.user.firstName; 
+        res.send(userName + " Sending a connection request!")
+    })
+ 
     //Get Request
     app.get("/signup", async(req,res)=>{
         const userEmail = req.body.emailId;
@@ -118,8 +138,10 @@ const validator = require("validator")
         res.status(401).send("Something went wrong!!")
     }
     })
+ 
+    
     //Delete request
-    app.delete("/user",async(req,res)=>{
+    app.delete("/user",async(req,res)=>{ 
         const userId = req.body.userId;
         try{
             await User.findByIdAndDelete({_id : userId});
