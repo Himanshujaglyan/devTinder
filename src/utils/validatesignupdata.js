@@ -17,4 +17,12 @@ const validatesignupdata = (req) => {
     }
 };
 
-module.exports = { validatesignupdata };
+const validateProfileUpdateDate = (req)=>{
+    //so yaha me sirf yai check kerunga ke user sirf yai fields ko update ker paye or eske alawa kuch nahi
+    const allowedFields = ["lastName","age","gender"];
+
+    const isEditAllowed = Object.keys(req.body).every(field => allowedFields.includes(field));
+    return isEditAllowed;//it return true or false ager sub match kera to true nahi to false;
+}
+
+module.exports = { validatesignupdata,validateProfileUpdateDate };

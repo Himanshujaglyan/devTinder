@@ -20,6 +20,9 @@ const userschema = new mongoose.Schema({
     password:{
         type: String
     },
+    fatherName:{
+        type: String 
+    },
     age:{
         type : Number
     },
@@ -27,6 +30,9 @@ const userschema = new mongoose.Schema({
         type:String,
         default:"This is the default about!!"
     },
+    gender:{
+        type: String
+    }
 },{
     timestamps:true
 })
