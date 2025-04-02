@@ -22,7 +22,7 @@ const userschema = new mongoose.Schema({
     },
     fatherName:{
         type: String ,
-        required:true
+        // required:true
     },
     age:{
         type : Number
