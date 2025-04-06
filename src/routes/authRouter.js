@@ -4,7 +4,8 @@ const {validatesignupdata} = require("../utils/validatesignupdata")
 const bcrypt = require("bcrypt");
 const User= require("../models/user")
 const validator = require("validator")
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const catchAsync = require("../utils/catchAsync");
 
 
 authrouter.post("/signup", async (req, res) => {
@@ -75,10 +76,10 @@ authrouter.post("/login" ,async(req,res) => {
 })
 
 //Logout
-authrouter.post("/logout",async (req,res)=>{
+authrouter.post("/logout", catchAsync(async (req,res)=>{
     res.cookie("token", null ,{
         expires : new Date(Date.now()),
     }).send("logout successfully!!")
-})
+}))
 
 module.exports = authrouter;
