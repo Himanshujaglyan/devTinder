@@ -1,6 +1,7 @@
 const express = require('express');
 const connectDB = require("./Config/database");
 const app = express();
+const cors = require("cors")
 // const User = require("./models/user")
 // const {userauth} = require("./Middleware/auth")
 // const {validatesignupdata} = require("./utils/validatesignupdata")
@@ -59,6 +60,10 @@ const cookieParser = require("cookie-parser")
 // --------------------------------------------------------------
     app.use(express.json());//this is middleware which helps to convert json into js object because server can't undertand json directly
     app.use(cookieParser());
+    app.use(cors({
+        origin:"http://localhost:5173",
+        credentials:true
+    }));
     
     const authRouter = require("./routes/authrouter")
     const profileRouter = require("./routes/profileRouter");
@@ -68,6 +73,7 @@ const cookieParser = require("cookie-parser")
     app.use("/",authRouter);
     app.use("/",profileRouter);
     app.use("/",requestRouter);
+    app.use("/",userRouter);
     //Delete request
     // app.delete("/user",async(req,res)=>{ 
     //     const userId = req.body.userId;

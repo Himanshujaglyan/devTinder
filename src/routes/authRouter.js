@@ -65,7 +65,7 @@ authrouter.post("/login" ,async(req,res) => {
         if(isPasswordMatch){
             const token = await jwt.sign({_id:user._id} ,"Dev@Tinder#786");//,{expiresIn:"0d"}
             res.cookie("token",token)
-            res.send("Login Successfully!!");
+            res.send(user);
         }else{
             throw new Error("Password not correct!!")
         }
