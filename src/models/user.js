@@ -33,7 +33,11 @@ const userschema = new mongoose.Schema({
     },
     gender:{
         type: String
+    },
+    profileImage:{
+        type:String,
     }
+    
 },{
     timestamps:true
 })

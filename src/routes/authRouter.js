@@ -11,7 +11,7 @@ const catchAsync = require("../utils/catchAsync");
 authrouter.post("/signup", async (req, res) => {
     try {
         validatesignupdata(req); //  Agar yahan error aayi toh catch block me chali jayegi
-        const {firstName,lastName,emailId,password,age,gender,fatherName} = req.body;
+        const {firstName,lastName,emailId,password,age,gender,fatherName,profileImage} = req.body;
         const passwordHash = await bcrypt.hash(password,10);
         // console.log(passwordHash);
         const user = new User({
@@ -21,7 +21,8 @@ authrouter.post("/signup", async (req, res) => {
             password : passwordHash,
             age,
             gender,
-            fatherName
+            fatherName,
+            profileImage
         });
         await user.save();
         res.send("User successfully Added!");
