@@ -25,7 +25,7 @@ authrouter.post("/signup", async (req, res) => {
             profileImage
         });
         await user.save();
-        res.send("User successfully Added!");
+        res.send("User successfully Added!",user);
     } catch (err) {
         res.status(400).send("Validation Error: " + err.message); // 🛠️ Error ka proper response
     }
@@ -51,30 +51,34 @@ authrouter.get("/signup", async(req,res)=>{
 //Login
 authrouter.post("/login" ,async(req,res) => {
     try{
-        const {emailId , password} = req.body;
+        const {emailId, password} = req.body;
         if(!validator.isEmail(emailId)){
             throw new Error("Email not valid!");
         }else if(!validator.isStrongPassword(password)){
             throw new Error("Not a strong password!");
         }
         
-         const user = await User.findOne({emailId:emailId})  
+        const user = await User.findOne({emailId:emailId})  
+        console.log(user); 
+
         if(!user){
             throw new Error("User not found in DB");
         }
+        
         const isPasswordMatch = await bcrypt.compare(password , user.password);
         if(isPasswordMatch){
-            const token = await jwt.sign({_id:user._id} ,"Dev@Tinder#786");//,{expiresIn:"0d"}
-            res.cookie("token",token)
-            res.send(user);
+            const token = await jwt.sign({_id:user._id}, "Dev@Tinder#786");
+            res.cookie("token", token);
+            res.send(user); 
         }else{
-            throw new Error("Password not correct!!")
+            throw new Error("Password not correct!!");
         }
     }
     catch(err){
         res.status(400).send("Error : " + err.message);
     }
-})
+});
+
 
 //Logout
 authrouter.post("/logout", catchAsync(async (req,res)=>{
